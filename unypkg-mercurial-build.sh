@@ -36,11 +36,14 @@ source_tarball_basename="$(
         tail -n 1
 )"
 source_tarball_url="https://mercurial-scm.org/release/$source_tarball_basename"
+source_folder_name="${source_tarball_basename//\.tar.*/}"
+latest_ver="$(echo $source_tarball_basename | grep -oE "[0-9]*(([0-9]+\.)*[0-9]+)")"
+latest_commit_id="$latest_ver"
 
 ### Get version info from git remote
-latest_head="$(git ls-remote --refs --tags --sort="v:refname" $pkggit | grep -E "mercurial-[0-9.]*$" | tail --lines=1)"
-latest_ver="$(echo "$latest_head" | grep -o "mercurial-[0-9.]*" | sed "s|mercurial-||")"
-latest_commit_id="$(echo "$latest_head" | cut --fields=1)"
+#latest_head="$(git ls-remote --refs --tags --sort="v:refname" $pkggit | grep -E "mercurial-[0-9.]*$" | tail --lines=1)"
+#latest_ver="$(echo "$latest_head" | grep -o "mercurial-[0-9.]*" | sed "s|mercurial-||")"
+#latest_commit_id="$(echo "$latest_head" | cut --fields=1)"
 
 ### Check if the build should be continued
 #version_details
@@ -54,6 +57,11 @@ latest_commit_id="$(echo "$latest_head" | cut --fields=1)"
 
 check_for_repo_and_create
 #git_clone_source_repo
+
+wget "$source_tarball_url"
+tar xfz "$source_tarball_basename"
+rm "$source_tarball_basename"
+mv "$source_folder_name" mercurial
 
 archiving_source
 
@@ -76,13 +84,16 @@ get_include_paths_temp
 
 unset LD_RUN_PATH
 
-cat Makefile | sed "s|prefix.*=.*/usr|prefix=|g" -i Makefile
+make build
 
-make -j"$(nproc)"
-make -j"$(nproc)" check
+sed -i '138,142d' Makefile
+TESTFLAGS="-j$(nproc) --tmpdir tmp" make check
+pushd tests  &&
+  rm -rf tmp &&
+  ./run-tests.py --tmpdir tmp test-gpg.t
+popd
 
-mkdir -pv /uny/pkg/"$pkgname"/"$pkgver"
-make DESTDIR=/uny/pkg/"$pkgname"/"$pkgver" install
+make PREFIX=/uny/pkg/"$pkgname"/"$pkgver" install-bin
 
 ####################################################
 ### End of individual build script
