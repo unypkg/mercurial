@@ -9,6 +9,9 @@ set -xv
 wget -qO- uny.nu/pkg | bash -s buildsys
 mkdir /uny/tmp
 
+### Installing build dependencies
+unyp install python
+
 ### Getting Variables from files
 UNY_AUTO_PAT="$(cat UNY_AUTO_PAT)"
 export UNY_AUTO_PAT
@@ -33,8 +36,8 @@ pkgname="mercurial"
 #gitdepth="--depth=1"
 
 source_tarball_basename="$(
-    wget -q --server-response https://mercurial-scm.org/release/ -O- 2>&1 | grep -o "mercurial-[0-9.]*.tar.gz" | sort -uV |
-        tail -n 1
+  wget -q --server-response https://mercurial-scm.org/release/ -O- 2>&1 | grep -o "mercurial-[0-9.]*.tar.gz" | sort -uV |
+    tail -n 1
 )"
 source_tarball_url="https://mercurial-scm.org/release/$source_tarball_basename"
 #source_folder_name="${source_tarball_basename//\.tar.*/}"
