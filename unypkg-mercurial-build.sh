@@ -10,6 +10,7 @@ wget -qO- uny.nu/pkg | bash -s buildsys
 mkdir /uny/tmp
 
 ### Installing build dependencies
+unyp install openssl
 unyp install python
 
 ### Getting Variables from files
