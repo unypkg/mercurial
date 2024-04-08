@@ -11,6 +11,7 @@ mkdir /uny/tmp
 
 ### Installing build dependencies
 unyp install openssl
+unyp install libffi
 unyp install python
 
 ### Getting Variables from files
