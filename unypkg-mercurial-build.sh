@@ -13,6 +13,8 @@ mkdir /uny/tmp
 unyp install openssl
 unyp install libffi
 unyp install python
+pip3_bin=(/uny/pkg/python/*/bin/pip3)
+"${pip3_bin[0]}" install setuptools
 
 ### Getting Variables from files
 UNY_AUTO_PAT="$(cat UNY_AUTO_PAT)"
